@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.example.gettvprogramapp.R;
@@ -15,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -24,6 +26,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private WifiListAdapter mAdapter;
     private List<WifiListItem> wifiListItems = new ArrayList<>();
 
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
@@ -53,64 +58,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private class WifiListAdapter extends ArrayAdapter<WifiListItem> {
-
-        private LayoutInflater mLayoutInflater;
-        private List<WifiListItem> mDataList;
-
-        public WifiListAdapter(@NonNull Context context, @NonNull List<WifiListItem> dataList) {
-            super(context, R.layout.layout_wifilist_item, dataList);
-            mLayoutInflater = LayoutInflater.from(context);
-            mDataList = dataList;
-        }
-
-        @Override
-        public int getCount() {
-            return mDataList.size();
-        }
-
-        @Nullable
-        @Override
-        public WifiListItem getItem(int position) { return mDataList.get(position); }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
-            ListItemHolder holder;
-
-            if (convertView == null) {
-                // convertViewがnullの場合は、新規にViewを作成する
-                convertView = mLayoutInflater.inflate(R.layout.layout_wifilist_item, parent, false);
-                TextView ssidView = convertView.findViewById(R.id.ssid);
-
-                holder = new ListItemHolder();
-                holder.setSsidView(ssidView);
-                convertView.setTag(holder);
-            } else {
-                // convertViewがnullでない場合は、Viewを再利用する
-                holder = (ListItemHolder)convertView.getTag();
-            }
-            WifiListItem item = mDataList.get(position);
-            // タイトルを設定
-            holder.getSsidView().setText(item.getSsid());
-
-            return convertView;
-        }
-    }
-
-    private class ListItemHolder {
-        private TextView ssidView;
-
-        TextView getSsidView() {
-            return ssidView;
-        }
-
-        void setSsidView(TextView ssidView) {
-            this.ssidView = ssidView;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,28 +66,38 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         mListView = findViewById(R.id.wifi_list);
         mAdapter = new WifiListAdapter(this, wifiListItems);
         mListView.setAdapter(mAdapter);
-
         wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+            }
+        });
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                onResume();
+            }
+        });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onPause() {
         unregisterReceiver(wifiScanReceiver);
         super.onPause();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onResume() {
         super.onResume();
@@ -151,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
         boolean success = wifiManager.startScan();
         if (!success) {
-            // scan failure handling
             scanFailure();
         }
     }
@@ -187,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void scanSuccess() {
         Log.d(MainActivity.class.getSimpleName(), "成功しました");
 
