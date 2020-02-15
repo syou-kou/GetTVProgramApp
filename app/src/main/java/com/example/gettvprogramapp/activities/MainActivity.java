@@ -12,36 +12,36 @@ import android.os.Bundle;
 import com.example.gettvprogramapp.R;
 import com.example.gettvprogramapp.pojo.WifiListItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ListView listView;
+
     private WifiManager wifiManager;
-    private ListView mListView;
-    private WifiListAdapter mAdapter;
+    private WifiListAdapter wifiListAdapter;
     private List<WifiListItem> wifiListItems = new ArrayList<>();
 
+    private TVProgramReader tvProgramReader;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
@@ -66,15 +66,20 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mListView = findViewById(R.id.wifi_list);
-        mAdapter = new WifiListAdapter(this, wifiListItems);
-        mListView.setAdapter(mAdapter);
+        listView = findViewById(R.id.wifi_list);
+        wifiListAdapter = new WifiListAdapter(this, wifiListItems);
+        listView.setAdapter(wifiListAdapter);
         wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
+                try {
+                    new TVProgramReader(MainActivity.this).execute(
+                            new URL("http://api.nhk.or.jp/v2/pg/now/130/g1.json?key=Igp36pGY5gdtnMUglypxoIDDGWJmIW6f"));
+                } catch (MalformedURLException e) {
+                    Toast.makeText(MainActivity.this, "取得エラー", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -136,11 +141,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayWifiList(List<WifiListItem> dataList) {
         // Adapter内のデータをリセットする
-        mAdapter.clear();
+        wifiListAdapter.clear();
         // 作成した表示データをAdapterに追加する
-        mAdapter.addAll(dataList);
+        wifiListAdapter.addAll(dataList);
         // Adapterにデータが更新されたことを通知する
-        mAdapter.notifyDataSetChanged();
+        wifiListAdapter.notifyDataSetChanged();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)

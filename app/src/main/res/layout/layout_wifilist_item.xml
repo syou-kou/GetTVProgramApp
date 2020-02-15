@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="SSID"/>
+            android:text="@string/ssid"/>
 
         <TextView
             android:id="@+id/venue_name"
@@ -32,7 +32,7 @@
             android:textSize="12sp"
             android:textColor="@android:color/black"
             android:layout_marginStart="24dp"
-            android:text="会場名" />
+            android:text="@string/venue_name" />
 
     </LinearLayout>
 

@@ -85,7 +85,6 @@ public class WifiListAdapter extends ArrayAdapter<WifiListItem> {
 
         // 会場名を設定
         holder.getVenueNameView().setText(item.getVenueName());
-        holder.getVenueNameView().setText("テスト");
 
         return convertView;
     }

@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">GetTVProgramApp</string>
     <string name="action_settings">Settings</string>
+    <string name="ssid">SSID</string>
+    <string name="venue_name">会場名</string>
+    <string name="title_activity_connection">ConnectionActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
