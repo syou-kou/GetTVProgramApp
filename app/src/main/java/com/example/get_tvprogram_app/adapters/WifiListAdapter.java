@@ -1,10 +1,6 @@
-package com.example.gettvprogramapp.activities;
+package com.example.get_tvprogram_app.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,40 +11,39 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.gettvprogramapp.R;
-import com.example.gettvprogramapp.pojo.WifiListItem;
+import com.example.get_tvprogram_app.R;
+import com.example.get_tvprogram_app.pojo.WifiListItem;
 
 import java.util.List;
 
 public class WifiListAdapter extends ArrayAdapter<WifiListItem> {
 
-    private LayoutInflater mLayoutInflater;
-    private List<WifiListItem> mDataList;
+    private LayoutInflater layoutInflater;
+    private List<WifiListItem> dataList;
 
     public WifiListAdapter(@NonNull Context context, @NonNull List<WifiListItem> dataList) {
         super(context, R.layout.layout_wifilist_item, dataList);
-        mLayoutInflater = LayoutInflater.from(context);
-        mDataList = dataList;
+        layoutInflater = LayoutInflater.from(context);
+        this.dataList = dataList;
     }
 
     @Override
     public int getCount() {
-        return mDataList.size();
+        return dataList.size();
     }
 
     @Nullable
     @Override
-    public WifiListItem getItem(int position) { return mDataList.get(position); }
+    public WifiListItem getItem(int position) { return dataList.get(position); }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
         ListItemHolder holder;
 
         if (convertView == null) {
             // convertViewがnullの場合は、新規にViewを作成する
-            convertView = mLayoutInflater.inflate(R.layout.layout_wifilist_item, parent, false);
+            convertView = layoutInflater.inflate(R.layout.layout_wifilist_item, parent, false);
             ImageView wifiLevelView = convertView.findViewById(R.id.wifi_level);
             TextView ssidView = convertView.findViewById(R.id.ssid);
             TextView venueNameView = convertView.findViewById(R.id.venue_name);
@@ -62,7 +57,7 @@ public class WifiListAdapter extends ArrayAdapter<WifiListItem> {
             // convertViewがnullでない場合は、Viewを再利用する
             holder = (ListItemHolder)convertView.getTag();
         }
-        WifiListItem item = mDataList.get(position);
+        WifiListItem item = dataList.get(position);
 
         // wifiレベルの画像ファイルを設定
         int drawableId;
@@ -90,27 +85,22 @@ public class WifiListAdapter extends ArrayAdapter<WifiListItem> {
     }
 
     private class ListItemHolder {
-
         private ImageView wifiLevelView;
         private TextView ssidView;
         private TextView venueNameView;
 
-        public ImageView getWifiLevelView() { return wifiLevelView; }
-
-        public void setWifiLevelView(ImageView wifiLevelView) { this.wifiLevelView = wifiLevelView; }
+        ImageView getWifiLevelView() { return wifiLevelView; }
+        void setWifiLevelView(ImageView wifiLevelView) { this.wifiLevelView = wifiLevelView; }
 
         TextView getSsidView() {
             return ssidView;
         }
-
         void setSsidView(TextView ssidView) {
             this.ssidView = ssidView;
         }
 
-        public TextView getVenueNameView() { return venueNameView; }
-
-        public void setVenueNameView(TextView venueNameView) { this.venueNameView = venueNameView; }
-
+        TextView getVenueNameView() { return venueNameView; }
+        void setVenueNameView(TextView venueNameView) { this.venueNameView = venueNameView; }
     }
 
 }

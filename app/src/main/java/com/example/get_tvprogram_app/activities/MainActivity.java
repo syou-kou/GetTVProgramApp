@@ -1,4 +1,4 @@
-package com.example.gettvprogramapp.activities;
+package com.example.get_tvprogram_app.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,11 +9,13 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.gettvprogramapp.R;
-import com.example.gettvprogramapp.pojo.WifiListItem;
+import com.example.get_tvprogram_app.R;
+import com.example.get_tvprogram_app.adapters.WifiListAdapter;
+import com.example.get_tvprogram_app.pojo.WifiListItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -23,10 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,14 +35,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
-
     private WifiManager wifiManager;
     private WifiListAdapter wifiListAdapter;
     private List<WifiListItem> wifiListItems = new ArrayList<>();
+    private TVProgramSearchTask tvProgramSearchTask;
+    private static final String URL_NHK =
+            "http://api.nhk.or.jp/v2/pg/now/130/g1.json?key=Igp36pGY5gdtnMUglypxoIDDGWJmIW6f";
 
-    private TVProgramReader tvProgramReader;
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
             if (success) {
                 scanSuccess();
             } else {
-                // scan failure handling
                 scanFailure();
             }
         }
@@ -63,8 +61,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.wifi_title);
 
         listView = findViewById(R.id.wifi_list);
         wifiListAdapter = new WifiListAdapter(this, wifiListItems);
@@ -74,35 +75,45 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                tvProgramSearchTask = new TVProgramSearchTask(MainActivity.this);
+                tvProgramSearchTask.setWifiListItem(wifiListAdapter.getItem(position));
+                tvProgramSearchTask.setWifiManager(wifiManager);
+                tvProgramSearchTask.setTvProgramSearchListener(
+                        new TVProgramSearchTask.TVProgramSearchListener() {
+                            @Override
+                            public void onSuccess(String result) {
+                                Intent intent = ShowTVProgramActivity.createIntent(
+                                        MainActivity.this, result);
+                                startActivity(intent);
+                            }
+                        }
+                );
                 try {
-                    new TVProgramReader(MainActivity.this).execute(
-                            new URL("http://api.nhk.or.jp/v2/pg/now/130/g1.json?key=Igp36pGY5gdtnMUglypxoIDDGWJmIW6f"));
+                    tvProgramSearchTask.execute(new URL(URL_NHK));
                 } catch (MalformedURLException e) {
-                    Toast.makeText(MainActivity.this, "取得エラー", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
                 }
             }
         });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @RequiresApi(api = Build.VERSION_CODES.P)
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 onResume();
             }
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onPause() {
         unregisterReceiver(wifiScanReceiver);
         super.onPause();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onResume() {
         super.onResume();
@@ -148,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         wifiListAdapter.notifyDataSetChanged();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private void scanSuccess() {
         Log.d(MainActivity.class.getSimpleName(), "成功しました");
 
@@ -166,6 +177,5 @@ public class MainActivity extends AppCompatActivity {
 
     private void scanFailure() {
         Log.d(MainActivity.class.getSimpleName(), "失敗しました");
-        List<ScanResult> results = wifiManager.getScanResults();
     }
 }

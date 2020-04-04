@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:text="@string/ssid"/>
+            android:text="@string/ssid" />
 
         <TextView
             android:id="@+id/venue_name"

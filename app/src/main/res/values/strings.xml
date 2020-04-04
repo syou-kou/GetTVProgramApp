@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">GetTVProgramApp</string>
     <string name="action_settings">Settings</string>
+    <string name="wifi_title">Wifiアクセスポイント選択</string>
     <string name="ssid">SSID</string>
     <string name="venue_name">会場名</string>
-    <string name="title_activity_connection">ConnectionActivity</string>
+    <string name="tvprogram_title">NHK総合1の放送情報</string>
+    <string name="title">タイトル</string>
+    <string name="subtitle">サブタイトル</string>
+    <string name="time">放送時間</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
